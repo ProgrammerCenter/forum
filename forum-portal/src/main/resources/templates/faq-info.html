@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<div th:replace="include/header :: head(~{::title}, ~{}, ~{})">
+    <title th:text="${posts.title}">程序员中心</title>
+</div>
+<div th:replace="include/posts-style :: posts_style"></div>
+<body>
+<div th:replace="include/navbar :: header"></div>
+
+<div th:replace="include/container :: container_both(~{::left}, ~{::right})">
+    <left>
+        <div th:replace="include/posts-info :: posts_info(${posts}, '/faq')"></div>
+
+        <div th:replace="include/comment-list :: comment_list(${posts}, ${comments}, 'faq', ${pager})"></div>
+
+        <!-- 相关阅读 -->
+        <div th:replace="include/related-posts :: related_posts(${relatedPosts})"></div>
+    </left>
+    <right>
+        <div class="posts-author-box" style="text-align: center;">
+            <div class="d-flex justify-content-center align-self-center">
+                <img th:alt="${posts.authorName}"
+                     th:src="${posts.authorAvatar}"
+                     style="width: 80px;height: 80px;border: 1px solid #ddd;border-radius: 50%;"
+                     class="img-fluid" alt="...">
+            </div>
+            <div class="text-center"
+                 style="height: 50px;font-size: 18px;font-weight: 500;line-height: 1.5;padding-top: 10px;">
+                <a th:href="${'/user/' + posts.authorId}" th:text="${posts.authorName}">阿崔</a>
+            </div>
+            <button id="followBtn"
+                    th:data-target="${isLogin ? '' : '#loginModal'}"
+                    th:data-toggle="${isLogin ? '' : 'modal'}"
+                    th:data-has-follow="${hasFollow}"
+                    th:data-followed="${posts.authorId}"
+                    th:text="${hasFollow ? '取消关注' : '关注 TA'}"
+                    th:class="${'btn ' + (hasFollow ? 'btn-secondary' : 'btn-primary')}">关注 TA</button>
+        </div>
+
+        <!-- 作者其他文章 -->
+        <div th:replace="include/posts-card :: posts_card('作者其他文章', ${'/user/' + posts.authorId + '?type=问答'}, '/faq/', ${authorFaqList})"></div>
+
+        <!-- 常用标签 -->
+        <div th:replace="include/used-tags :: used_tags('常用标签', ${usedTags})"></div>
+    </right>
+</div>
+
+<div th:replace="include/footer :: footer"></div>
+<div th:replace="include/posts-script :: posts_script"></div>
+<script>
+document.addEventListener('DOMContentLoaded', function (event) {
+    if (document.querySelectorAll('pre code').length === 0) {
+        return;
+    }
+
+    // 为什么不写 script 标签加载下面资源？有的文章内容没有代码块，就不需要加载下面的资源，可以加快页面展示速度
+    // 加载 highlight 样式文件
+    loadLink('https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css');
+
+    // 加载 highlight 脚本文件
+    loadScript('https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js', function () {
+        document.querySelectorAll('pre code').forEach(function (block) {
+            hljs.highlightBlock(block);
+        });
+    });
+});
+</script>
+</body>
+</html>
